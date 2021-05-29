@@ -43,6 +43,8 @@ Route::put('organizations/{organization}/restore')->name('organizations.restore'
 // Reports
 Route::get('reports')->name('reports')->uses('ReportsController')->middleware('auth');
 
+//Owners
+Route::get('owners')->name('owners')->uses('OwnerController@index')->middleware('remember', 'auth');
 Route::group(['prefix' => 'web-api', 'as'=>'web-api.'], function()
 {
     Route::get('countries')->name('countries')->uses('ApiController@countries');

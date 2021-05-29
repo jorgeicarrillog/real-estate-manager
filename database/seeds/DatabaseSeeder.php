@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
 
-        factory(User::class)->create([
+        $user = factory(User::class)->create([
             'first_name' => 'John',
             'last_name' => 'Doe',
             'email' => 'johndoe@example.com',
@@ -31,7 +31,9 @@ class DatabaseSeeder extends Seeder
         $organization = factory(Organization::class)
             ->create(['citie_id' => $citie->id]);
 
-        $owner = factory(Owner::class)->create();
+        $user->organizations()->attach($organization);
+
+        $owner = factory(Owner::class)->create(['organization_id' => $organization->id]);
 
         $properties_type = factory(PropertiesType::class)->create([
             'name' => 'Alquiler',

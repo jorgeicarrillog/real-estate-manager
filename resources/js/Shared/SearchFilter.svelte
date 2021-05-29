@@ -80,7 +80,7 @@
                         <option value="owner">Admin</option>
                     </SelectInput>
                 {/if}
-
+                {#if filters.hasOwnProperty('trashed')}
                 <SelectInput
                     label="Trashed"
                     name="trashed"
@@ -91,9 +91,11 @@
                     <option value="with">Con los desactivados</option>
                     <option value="only">Solo los desactivados</option>
                 </SelectInput>
+                {/if}
             </div>
         </div>
-
+        
+        {#if filters.hasOwnProperty('role') || filters.hasOwnProperty('trashed')}
         <button
             on:click={() => opened = true}
             class="px-4 md:px-6 rounded-l border-r hover:bg-gray-100 focus:outline-none focus:border-white focus:shadow-outline focus:z-10"
@@ -110,6 +112,7 @@
                 </svg>
             </div>
         </button>
+        {/if}
 
         <input
             class="relative w-full px-6 py-3 rounded-r focus:shadow-outline"

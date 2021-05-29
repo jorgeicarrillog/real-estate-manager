@@ -44,7 +44,7 @@ class AppServiceProvider extends ServiceProvider
                         'last_name' => Auth::user()->last_name,
                         'email' => Auth::user()->email,
                         'role' => Auth::user()->role,
-                        'organizations' => Auth::user()->organizations()->orderBy('name')->get()->map->only('id', 'name'),
+                        'organizations_count' => Auth::user()->organizations()->count(),
                     ] : null,
                 ];
             },
