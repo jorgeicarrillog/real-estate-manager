@@ -3,5 +3,5 @@
 </script>
 
 <svelte:head>
-    <title>{title ? `${title} | Ping CRM` : 'Ping CRM'}</title>
+    <title>{title ? `${title} | Inmo CRM` : 'Inmo CRM'}</title>
 </svelte:head>

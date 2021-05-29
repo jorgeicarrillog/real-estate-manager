@@ -35,14 +35,14 @@
                     href={route('users.edit', auth.user.id)}
                     class="block px-6 py-2 hover:bg-indigo-600 hover:text-white"
                 >
-                    My Profile
+                    Mi Perfil
                 </InertiaLink>
 
                 <InertiaLink
                     href={route('users')}
                     class="block px-6 py-2 hover:bg-indigo-600 hover:text-white"
                 >
-                    Manage Users
+                    Gestionar usuarios
                 </InertiaLink>
 
                 <InertiaLink
@@ -50,7 +50,7 @@
                     class="block px-6 py-2 hover:bg-indigo-600 hover:text-white"
                     method="post"
                 >
-                    Logout
+                    Salir
                 </InertiaLink>
             </div>
 

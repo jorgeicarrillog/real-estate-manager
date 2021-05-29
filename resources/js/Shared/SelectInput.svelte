@@ -21,7 +21,7 @@
         {...props}
         class="form-select"
         class:error={errors && errors.length}
-        on:change={onChange}
+        on:blur={onChange}
         bind:value
     >
         <slot/>
