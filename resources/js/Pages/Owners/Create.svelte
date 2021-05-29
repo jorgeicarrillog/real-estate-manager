@@ -12,15 +12,15 @@
     const route = window.route;
 
     $: errors = $page.errors;
+    $: organizations = $page.organizations;
 
     let sending = false;
     let values = {
         first_name: '',
         last_name: '',
         email: '',
-        password: '',
-        owner: '0',
-        photo: ''
+        photo: '',
+        organization_id: ''
     };
 
     function handleChange({ target: { name, value } }) {
@@ -45,24 +45,24 @@
         // for more info check utils.js
         const formData = toFormData(values);
 
-        Inertia.post(route('users.store'), formData).then(() =>  sending = false);
+        Inertia.post(route('owners.store'), formData).then(() =>  sending = false);
     }
 </script>
 
-<Helmet title="Create User" />
+<Helmet title="Crear Propietario" />
 
 <Layout>
     <div>
         <div>
             <h1 class="mb-8 font-bold text-3xl">
                 <InertiaLink
-                    href={route('users')}
+                    href={route('owners')}
                     class="text-indigo-600 hover:text-indigo-700"
                 >
-                    Users
+                    Propietarios
                 </InertiaLink>
 
-                <span class="text-indigo-600 font-medium"> /</span> Create
+                <span class="text-indigo-600 font-medium"> /</span> Crear
             </h1>
         </div>
 
@@ -71,53 +71,34 @@
                 <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
                     <TextInput
                         className="pr-6 pb-8 w-full lg:w-1/2"
-                        label="First Name"
+                        label="Nombres"
                         name="first_name"
                         errors={errors.first_name}
                         value={values.first_name}
                         onChange={handleChange}
+                        required
                     />
 
                     <TextInput
                         className="pr-6 pb-8 w-full lg:w-1/2"
-                        label="Last Name"
+                        label="Apellidos"
                         name="last_name"
                         errors={errors.last_name}
                         value={values.last_name}
                         onChange={handleChange}
+                        required
                     />
 
                     <TextInput
                         className="pr-6 pb-8 w-full lg:w-1/2"
-                        label="Email"
+                        label="Correo"
                         name="email"
                         type="email"
                         errors={errors.email}
                         value={values.email}
                         onChange={handleChange}
+                        required
                     />
-
-                    <TextInput
-                        className="pr-6 pb-8 w-full lg:w-1/2"
-                        label="Password"
-                        name="password"
-                        type="password"
-                        errors={errors.password}
-                        value={values.password}
-                        onChange={handleChange}
-                    />
-
-                    <SelectInput
-                        className="pr-6 pb-8 w-full lg:w-1/2"
-                        label="Owner"
-                        name="owner"
-                        errors={errors.owner}
-                        value={values.owner}
-                        onChange={handleChange}
-                    >
-                        <option value="1">Yes</option>
-                        <option value="0">No</option>
-                    </SelectInput>
 
                     <FileInput
                         className="pr-6 pb-8 w-full lg:w-1/2"
@@ -128,6 +109,21 @@
                         value={values.photo}
                         onChange={handleFileChange}
                     />
+
+                    <SelectInput
+                        className="pr-6 pb-8 w-full"
+                        label="Inmobiliaria"
+                        name="organization_id"
+                        errors={errors.organization_id}
+                        value={values.organization_id}
+                        onChange={handleChange}
+                        required
+                    >
+                        <option value="">Seleccionar</option>
+                        {#each organizations as org}
+                        <option value="{org.id}">{org.name}</option>
+                        {/each}
+                    </SelectInput>
                 </div>
 
                 <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex justify-end items-center">
@@ -136,7 +132,7 @@
                         type="submit"
                         className="btn-indigo"
                     >
-                        Create User
+                        Crear Propietario
                     </LoadingButton>
                 </div>
             </form>

@@ -33,7 +33,8 @@
                     <tr class="text-left font-bold">
                         <th class="px-6 pt-5 pb-4">Nombre</th>
                         <th class="px-6 pt-5 pb-4">Correo</th>
-                        <th class="px-6 pt-5 pb-4" colspan="2">Propiedades</th>
+                        <th class="px-6 pt-5 pb-4">Propiedades</th>
+                        <th class="px-6 pt-5 pb-4">Inmobiliaria</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,7 +45,7 @@
                             </td>
                         </tr>
                     {:else}
-                        {#each data as { id, name, photo, email, properties_count } (id)}
+                        {#each data as { id, name, photo, email, properties_count, organization } (id)}
                             <tr class="hover:bg-gray-100 focus-within:bg-gray-100">
                                 <td class="border-t">
                                     <InertiaLink
@@ -79,6 +80,16 @@
                                         class="px-6 py-4 flex items-center focus:text-indigo"
                                     >
                                         {properties_count}
+                                    </InertiaLink>
+                                </td>
+
+                                <td class="border-t">
+                                    <InertiaLink
+                                        tabindex="-1"
+                                        href={route('owners.edit', id)}
+                                        class="px-6 py-4 flex items-center focus:text-indigo"
+                                    >
+                                        {organization}
                                     </InertiaLink>
                                 </td>
 

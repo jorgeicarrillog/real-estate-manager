@@ -11,7 +11,7 @@ class Owner extends Model
      *
      * @var array
      */
-    protected $fillable = ['organization__id', 'first_name', 'last_name', 'email'];
+    protected $fillable = ['organization_id', 'first_name', 'last_name', 'email'];
 
     public function organization()
     {
