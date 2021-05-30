@@ -46,7 +46,7 @@ class PropertieController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Organization $organization,PropertieRequest $request)
+    public function store(Organization $organization, PropertieRequest $request)
     {
         $propertie = new Propertie();
         $propertie->fill($request->all());
@@ -80,21 +80,42 @@ class PropertieController extends Controller
      * @param  \App\Propertie  $propertie
      * @return \Illuminate\Http\Response
      */
-    public function edit(Propertie $propertie)
+    public function edit(Organization $organization, Propertie $propertie)
     {
-        //
+        $types = PropertiesType::orderBy('name')->get();
+        $owners = $organization->owners()->orderBy('first_name')->orderBy('last_name')->get();
+
+        $propertie->load('citie.department.countrie');
+        $propertie->photo = $propertie->photoUrl(['w' => 60, 'h' => 60, 'fit' => 'crop']);
+
+        return Inertia::render('Properties/Edit', [
+            'propertie' => $propertie,
+            'types' => $types,
+            'owners' => $owners,
+            'organization' => $organization,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  PropertieRequest  $request
      * @param  \App\Propertie  $propertie
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Propertie $propertie)
+    public function update(Organization $organization, Propertie $propertie, PropertieRequest $request)
     {
-        //
+        $propertie->fill($request->all());
+        
+        if ($request->file('photo') && $request->file('photo')->isValid()) {
+            $propertie->update(['photo_path' => $request->file('photo')->store('properties')]);
+        }
+
+        if($propertie->save()){
+            return Redirect::route('properties.edit', ['organization'=>$organization->id, 'propertie'=>$propertie->id])->with('success', 'Propiedad actualizada.');
+        }
+        return Redirect::route('properties.edit', ['organization'=>$organization->id, 'propertie'=>$propertie->id])->with('error', 'La propiedad no pudo ser actualizada.');
+
     }
 
     /**

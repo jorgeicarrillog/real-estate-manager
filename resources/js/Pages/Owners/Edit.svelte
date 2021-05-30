@@ -183,6 +183,7 @@
                 <table class="w-full whitespace-no-wrap">
                     <thead>
                         <tr class="text-left font-bold">
+                            <th class="px-6 pt-5 pb-4">ID</th>
                             <th class="px-6 pt-5 pb-4">Nombre</th>
                             <th class="px-6 pt-5 pb-4">Ciudad</th>
                             <th class="px-6 pt-5 pb-4">Tipo Negocio</th>
@@ -199,6 +200,15 @@
                         {:else}
                             {#each properties as pty (pty.id)}
                                 <tr class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                    <td class="border-t">
+                                        <InertiaLink
+                                            tabindex="-1"
+                                            href={route('properties.edit', {propertie:pty.id, organization: pty.organization_id})}
+                                            class="px-6 py-4 flex items-center focus:text-indigo"
+                                        >
+                                            {pty.id}
+                                        </InertiaLink>
+                                    </td>
                                     <td class="border-t">
                                         <InertiaLink
                                             href={route('properties.edit', {propertie:pty.id, organization: pty.organization_id})}

@@ -17,7 +17,7 @@ class Propertie extends Model
      *
      * @var array
      */
-    protected $fillable = ['organization_id', 'owner_id', 'properties_type_id', 'citie_id', 'title', 'description', 'address', 'longitude', 'latitude', 'area', 'bedrooms', 'toilets', 'floor', 'value'];
+    protected $fillable = ['organization_id', 'owner_id', 'properties_type_id', 'citie_id', 'title', 'description', 'address', 'longitude', 'latitude', 'area', 'bedrooms', 'toilets', 'floor', 'value', 'photo_path'];
 
     public function propertiesType()
     {

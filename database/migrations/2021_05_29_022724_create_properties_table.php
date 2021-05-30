@@ -29,6 +29,7 @@ class CreatePropertiesTable extends Migration
             $table->integer('toilets');
             $table->integer('value');
             $table->integer('floor')->nullable();
+            $table->string('photo_path', 100)->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('organization_id')->references('id')->on('organizations');

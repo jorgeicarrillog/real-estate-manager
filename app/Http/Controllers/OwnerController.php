@@ -90,7 +90,7 @@ class OwnerController extends Controller
                 'photo' => $owner->photoUrl(['w' => 60, 'h' => 60, 'fit' => 'crop']),
                 'organization' => $owner->organization->name,
             ],
-            'properties' => $owner->properties()->with('propertiesType', 'citie.department.countrie')->paginate(),
+            'properties' => $owner->properties()->orderBy('updated_at', 'desc')->orderBy('created_at', 'desc')->with('propertiesType', 'citie.department.countrie')->paginate(),
             'organizations' => auth()->user()->organizations()->orderBy('name')->select('id', 'name')->get()
         ]);
     }

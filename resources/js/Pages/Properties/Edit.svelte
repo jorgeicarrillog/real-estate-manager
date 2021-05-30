@@ -4,48 +4,99 @@
     import { InertiaLink, page } from '@inertiajs/inertia-svelte';
     import { toFormData } from '@/utils';
     import axios from 'axios'
+    import Map from "@anoram/leaflet-svelte";
 
     import Helmet from '@/Shared/Helmet.svelte';
     import Layout from '@/Shared/Layout.svelte';
     import DeleteButton from '@/Shared/DeleteButton.svelte';
     import LoadingButton from '@/Shared/LoadingButton.svelte';
     import TextInput from '@/Shared/TextInput.svelte';
+    import TextArea from '@/Shared/TextArea.svelte';
     import SelectInput from '@/Shared/SelectInput.svelte';
     import TrashedMessage from '@/Shared/TrashedMessage.svelte';
-    import Icon from '@/Shared/Icon.svelte';
-    import Pagination from '@/Shared/Pagination.svelte';
-    import MoneyFormat from '@/Shared/MoneyFormat.svelte';
     import FileInput from '@/Shared/FileInput.svelte';
 
     const route = window.route;
 
-    $: links = $page.properties.links;
-    $: properties = $page.properties.data;
-    let { organization } = $page;
+    export let propertie;
+    export let types;
+    export let owners;
+    export let organization;
+
     $: errors = $page.errors;
+    $: propertie = $page.propertie;
+    $: types = $page.types;
+    $: owners = $page.owners;
     $: organization = $page.organization;
 
+    //map
+    let options = {
+        zoom: 14,
+        center:[5.0504997,-75.4944],
+        mapID: "map",
+    };
+    let MAP_EL;
+	let latlng = ''
+    async function init() {
+        let map = MAP_EL.getMap();
+        
+        if(navigator.geolocation && (propertie.latitude==0 && propertie.longitude==0)) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                let latitude = position.coords.latitude;
+                let longitude = position.coords.longitude;
+                map.setView([latitude,longitude],13);
+            }, ()=>{}, {timeout:3000});
+        }else if(propertie.latitude!=0 && propertie.longitude!=0){
+            map.setView([propertie.latitude,propertie.longitude],13);
+            latlng = L.latLng(propertie.latitude, propertie.longitude);
+            L.popup()
+            .setLatLng(latlng)
+            .setContent(`<p>${values.title}<br>Ubicación: ${latlng}</p>`)
+            .openOn(map);
+        }
+
+        map.on("click", function (e) {
+        latlng = e.latlng
+        values.latitude = e.latlng.lat;
+        values.longitude = e.latlng.lng
+        var popLocation = e.latlng;
+        L.popup()
+            .setLatLng(popLocation)
+            .setContent(`<p>${values.title}<br>Ubicación: ${e.latlng}</p>`)
+            .openOn(map);
+        });
+    }
+
+    //data
     let countries = [];
     let departments = [];
     let cities = [];
     let sending = false;
     let values = {
-            name: organization.name || '',
-            email: organization.email || '',
-            phone: organization.phone || '',
-            address: organization.address || '',
-            citie_id: organization.citie_id || '',
-            deparment_id: organization.citie.department_id || '',
-            countrie_id: organization.citie.department.countrie_id || '',
-            postal_code: organization.postal_code || '',
-            photo: ''
-        };
+        owner_id: propertie.owner_id || '',
+        properties_type_id: propertie.properties_type_id || '',
+        citie_id: propertie.citie_id || '',
+        department_id: propertie.citie.department_id || '',
+        countrie_id: propertie.citie.department.countrie_id || '',
+        title: propertie.title || '',
+        description: propertie.description || '',
+        address: propertie.address || '',
+        longitude: propertie.longitude || '',
+        latitude: propertie.latitude || '',
+        area: propertie.area || '',
+        bedrooms: propertie.bedrooms || '',
+        toilets: propertie.toilets || '',
+        floor: propertie.floor || '',
+        value: propertie.value || ''
+    };
 
     function handleChange({ target: { name, value } }) {
         values = {
             ...values,
             [name]: value
         };
+        if(name=='countrie_id'){getDeptos(value)}
+        if(name=='deparment_id'){getCities(value)}
     }
 
     function handleFileChange(file) {
@@ -66,18 +117,18 @@
     // For more info check utils.jf file
     const formData = toFormData(values, 'PUT');
 
-        Inertia.post(route('organizations.update', organization.id), formData).then(() => sending = false);
+        Inertia.post(route('properties.update', {organization:organization.id, propertie:propertie.id}), formData).then(() => sending = false);
     }
 
     function destroy() {
         if (confirm('Esta seguro de desactivar esta inmobiliaria?')) {
-            Inertia.delete(route('organizations.destroy', organization.id));
+            Inertia.delete(route('properties.destroy', {organization:organization.id, propertie:propertie.id}));
         }
     }
 
     function restore() {
         if (confirm('Esta seguro de activar esta inmobiliaria?')) {
-            Inertia.put(route('organizations.restore', organization.id));
+            Inertia.put(route('properties.restore', {organization:organization.id, propertie:propertie.id}));
         }
     }
 
@@ -89,19 +140,19 @@
         getCities(values.deparment_id);
     })
     function getDeptos(id){
-        axios.get(route('web-api.departments')+'?field=id&value='+id).then((resp)=>{
+        axios.get(route('web-api.departments')+'?field=countrie_id&value='+id).then((resp)=>{
             departments = resp.data;
         });
         cities = [];
     }
     function getCities(id){
-        axios.get(route('web-api.cities')+'?field=id&value='+id).then((resp)=>{
+        axios.get(route('web-api.cities')+'?field=department_id&value='+id).then((resp)=>{
             cities = resp.data;
         });
     }
 </script>
 
-<Helmet title={values.name} />
+<Helmet title={values.title} />
 
 <Layout>
     <div>
@@ -112,68 +163,84 @@
             >
                 Inmobiliarias
             </InertiaLink>
+            <span class="text-indigo-600 font-medium mx-2">/</span>
+            <InertiaLink
+                href={route('organizations.edit', organization.id)}
+                class="text-indigo-600 hover:text-indigo-700"
+            >
+                {organization.name}
+            </InertiaLink>
 
             <span class="text-indigo-600 font-medium mx-2">/</span>
-            {values.name}
+            {values.title}
 
-            {#if organization.photo}
-                <img class="block w-8 h-8 rounded-full ml-4" src={organization.photo} alt={organization.name} />
+            {#if propertie.photo}
+                <img class="block w-8 h-8 rounded-full ml-4" src={propertie.photo} alt={propertie.name} />
             {/if}
         </h1>
 
-        {#if organization.deleted_at}
-            <TrashedMessage onRestore={restore}>Esta inmobiliaria esta desactivada.</TrashedMessage>
+        {#if propertie.deleted_at}
+            <TrashedMessage onRestore={restore}>Esta propiedad esta desactivada.</TrashedMessage>
         {/if}
 
-        <div class="bg-white rounded shadow overflow-hidden max-w-3xl">
+        <div class="bg-white rounded shadow overflow-hidden">
             <form on:submit|preventDefault={handleSubmit}>
                 <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
                     <TextInput
                         className="pr-6 pb-8 w-full lg:w-1/2"
-                        label="Nombre"
-                        name="name"
-                        errors={errors.name}
-                        bind:value={values.name}
+                        label="Titulo"
+                        name="title"
+                        errors={errors.title}
+                        value={values.title}
                         onChange={handleChange}
+                        required
                     />
 
                     <TextInput
-                        className="pr-6 pb-8 w-full lg:w-1/2"
-                        label="Correo"
-                        name="email"
-                        type="email"
-                        errors={errors.email}
-                        bind:value={values.email}
+                        className="pr-6 pb-8 w-full lg:w-1/4"
+                        label="Valor"
+                        name="value"
+                        type="number"
+                        step="1"
+                        errors={errors.value}
+                        value={values.value}
                         onChange={handleChange}
-                    />
-
-                    <TextInput
-                        className="pr-6 pb-8 w-full lg:w-1/2"
-                        label="Teléfono"
-                        name="phone"
-                        type="text"
-                        errors={errors.phone}
-                        bind:value={values.phone}
-                        onChange={handleChange}
-                    />
-
-                    <TextInput
-                        className="pr-6 pb-8 w-full lg:w-1/2"
-                        label="Dirección"
-                        name="address"
-                        type="text"
-                        errors={errors.address}
-                        bind:value={values.address}
-                        onChange={handleChange}
+                        required
                     />
 
                     <SelectInput
-                        className="pr-6 pb-8 w-full lg:w-1/2"
+                        className="pr-6 pb-8 w-full lg:w-1/4"
+                        label="Tipo"
+                        name="properties_type_id"
+                        errors={errors.properties_type_id}
+                        value={values.properties_type_id}
+                        onChange={handleChange}
+                        required
+                    >
+                        <option value=""></option>
+                        {#each types as pt (pt.id)}
+                        <option value="{pt.id}">{pt.name}</option>
+                        {/each}
+                    </SelectInput>
+
+                    <TextArea
+                        className="pr-6 pb-8 w-full"
+                        label="Descripción"
+                        name="description"
+                        errors={errors.description}
+                        value={values.description}
+                        onChange={handleChange}
+                        required
+                    />
+
+                    <SelectInput
+                        className="pr-6 pb-8 w-full lg:w-1/4"
                         label="País"
                         name="countrie_id"
                         errors={errors.countrie_id}
-                        bind:value={values.countrie_id}
+                        value={values.countrie_id}
                         onChange={handleChange}
+                        required
                     >
                         <option value=""></option>
                         {#each countries as co (co.id)}
@@ -182,12 +249,13 @@
                     </SelectInput>
 
                     <SelectInput
-                        className="pr-6 pb-8 w-full lg:w-1/2"
+                        className="pr-6 pb-8 w-full lg:w-1/4"
                         label="Departamento/Estado"
                         name="deparment_id"
                         errors={errors.deparment_id}
-                        bind:value={values.deparment_id}
+                        value={values.deparment_id}
                         onChange={handleChange}
+                        required
                     >
                         <option value=""></option>
                         {#each departments as dep (dep.id)}
@@ -196,12 +264,13 @@
                     </SelectInput>
 
                     <SelectInput
-                        className="pr-6 pb-8 w-full lg:w-1/2"
+                        className="pr-6 pb-8 w-full lg:w-1/4"
                         label="Ciudad"
                         name="citie_id"
                         errors={errors.citie_id}
-                        bind:value={values.citie_id}
+                        value={values.citie_id}
                         onChange={handleChange}
+                        required
                     >
                         <option value=""></option>
                         {#each cities as ct (ct.id)}
@@ -210,141 +279,105 @@
                     </SelectInput>
 
                     <TextInput
-                        className="pr-6 pb-8 w-full lg:w-1/2"
-                        label="Código postal"
-                        name="postal_code"
+                        className="pr-6 pb-8 w-full lg:w-1/4"
+                        label="Dirección"
+                        name="address"
                         type="text"
-                        errors={errors.postal_code}
-                        bind:value={values.postal_code}
+                        errors={errors.address}
+                        value={values.address}
                         onChange={handleChange}
                     />
 
+                    <TextInput
+                        className="pr-6 pb-8 w-full lg:w-1/12"
+                        label="Área"
+                        name="area"
+                        type="number"
+                        errors={errors.area}
+                        value={values.area}
+                        onChange={handleChange}
+                    />
+
+                    <TextInput
+                        className="pr-6 pb-8 w-full lg:w-1/12"
+                        label="Cuartos"
+                        name="bedrooms"
+                        type="number"
+                        step="1"
+                        errors={errors.bedrooms}
+                        value={values.bedrooms}
+                        onChange={handleChange}
+                    />
+
+                    <TextInput
+                        className="pr-6 pb-8 w-full lg:w-1/12"
+                        label="Baños"
+                        name="toilets"
+                        type="number"
+                        step="1"
+                        errors={errors.toilets}
+                        value={values.toilets}
+                        onChange={handleChange}
+                    />
+
+                    <TextInput
+                        className="pr-6 pb-8 w-full lg:w-1/12"
+                        label="Piso"
+                        name="floor"
+                        type="number"
+                        step="1"
+                        errors={errors.floor}
+                        value={values.floor}
+                        onChange={handleChange}
+                    />
+
+                    <SelectInput
+                        className="pr-6 pb-8 w-full lg:w-1/4"
+                        label="Propietario"
+                        name="owner_id"
+                        errors={errors.owner_id}
+                        value={values.owner_id}
+                        onChange={handleChange}
+                        required
+                    >
+                        <option value=""></option>
+                        {#each owners as ow (ow.id)}
+                        <option value="{ow.id}">{ow.first_name} {ow.last_name}</option>
+                        {/each}
+                    </SelectInput>
+
                     <FileInput
-                        className="pr-6 pb-8 w-full lg:w-1/2"
-                        label="Photo"
+                        className="pr-6 pb-8 w-full lg:w-1/4"
+                        label="Imagen principal"
                         name="photo"
                         accept="image/*"
                         errors={errors.photo}
                         value={values.photo}
                         onChange={handleFileChange}
                     />
+
+                    <div class="pr-6 pb-8 mb-3 w-full" style="height: 300px;">
+                        <p class="pb-3">
+                            Clic para ubicar la Propiedad
+                        </p>
+                        <Map {options} bind:this={MAP_EL} on:ready={init} />
+                    </div>
                 </div>
 
                 <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
-                    {#if !organization.deleted_at}
-                        <DeleteButton onDelete={destroy}>Desactivar Inmobiliaria</DeleteButton>
+                    {#if !propertie.deleted_at}
+                        <DeleteButton onDelete={destroy}>Desactivar Propiedad</DeleteButton>
                     {/if}
 
                     <LoadingButton
                         loading={sending}
                         type="submit"
-                        className="btn-indigo ml-auto"
+                        className="ml-2 btn-indigo"
                     >
-                        Actualizar Inmobiliaria
+                        Crear Inmobiliaria
                     </LoadingButton>
                 </div>
             </form>
-        </div>
-        
-        <div>
-            <h3 class="my-8 font-bold text-3xl">Propiedades</h3>
-            <div class="mb-6 flex justify-between items-center">
-
-                <InertiaLink
-                    class="btn-indigo"
-                    href={route('organizations.create')}
-                >
-                    <span>Crear</span>
-                    <span class="hidden md:inline"> Propiedad</span>
-                </InertiaLink>
-            </div>
-
-            <div class="bg-white rounded shadow overflow-x-auto">
-                <table class="w-full whitespace-no-wrap">
-                    <thead>
-                        <tr class="text-left font-bold">
-                            <th class="px-6 pt-5 pb-4">Nombre</th>
-                            <th class="px-6 pt-5 pb-4">Ciudad</th>
-                            <th class="px-6 pt-5 pb-4">Tipo Negocio</th>
-                            <th class="px-6 pt-5 pb-4">Valor</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {#if !properties || properties.length === 0}
-                            <tr>
-                                <td class="border-t px-6 py-4" colspan="4">
-                                    No se encontrarón propiedades.
-                                </td>
-                            </tr>
-                        {:else}
-                            {#each properties as pty (pty.id)}
-                                <tr class="hover:bg-gray-100 focus-within:bg-gray-100">
-                                    <td class="border-t">
-                                        <InertiaLink
-                                            href={route('organizations.edit', pty.id)}
-                                            class="px-6 py-4 flex items-center focus:text-indigo-700"
-                                        >
-                                            {pty.title}
-
-                                            {#if pty.deleted_at}
-                                                <Icon
-                                                    name="trash"
-                                                    className="flex-shrink-0 w-3 h-3 text-gray-400 fill-current ml-2"
-                                                />
-                                            {/if}
-                                        </InertiaLink>
-                                    </td>
-
-                                    <td class="border-t">
-                                        <InertiaLink
-                                            tabindex="-1"
-                                            href={route('organizations.edit', pty.id)}
-                                            class="px-6 py-4 flex items-center focus:text-indigo"
-                                        >
-                                            {pty.citie.name}
-                                        </InertiaLink>
-                                    </td>
-
-                                    <td class="border-t">
-                                        <InertiaLink
-                                            tabindex="-1"
-                                            href={route('organizations.edit', pty.id)}
-                                            class="px-6 py-4 flex items-center focus:text-indigo"
-                                        >
-                                            {pty.properties_type.name}
-                                        </InertiaLink>
-                                    </td>
-
-                                    <td class="border-t">
-                                        <InertiaLink
-                                            tabindex="-1"
-                                            href={route('organizations.edit', pty.id)}
-                                            class="px-6 py-4 flex items-center focus:text-indigo"
-                                        >
-                                            <MoneyFormat value={pty.value}></MoneyFormat>
-                                        </InertiaLink>
-                                    </td>
-
-                                    <td class="border-t w-px">
-                                        <InertiaLink
-                                            tabindex="-1"
-                                            href={route('organizations.edit', pty.id)}
-                                            class="px-4 flex items-center"
-                                        >
-                                            <Icon
-                                                name="cheveron-right"
-                                                className="block w-6 h-6 text-gray-400 fill-current"
-                                            />
-                                        </InertiaLink>
-                                    </td>
-                                </tr>
-                            {/each}
-                        {/if}
-                    </tbody>
-                </table>
-            </div>
-
-            <Pagination links={links} />
         </div>
     </div>
 </Layout>
