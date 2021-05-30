@@ -85,4 +85,49 @@ class OwnerApiController extends Controller
                     ]
         ]);
     }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  OwnerRequest  $request
+     * @param  \App\Owner  $owner
+     * @return \Illuminate\Http\Response
+     */
+    public function update(OwnerRequest $request, Owner $owner)
+    {
+        $owner->fill($request->only('organization_id', 'first_name', 'last_name', 'email'));
+        $owner->save();
+
+        if ($request->file('photo') && $request->file('photo')->isValid()) {
+            $owner->update(['photo_path' => $request->file('photo')->store('owners')]);
+        }
+        
+        $owner->type='owners';
+
+        return response()->json([
+            'data' => $owner->makeHidden('organization'),
+            'relationships' => [
+                'organization' => [
+                    'data' => [
+                        'type' => 'organizations',
+                        'id' => $owner->organization->id
+                    ],
+                    'links' => [
+                        "self" => route('api.v1.organizations.edit', $owner->organization->id),
+                        "related" => url()->current()
+                    ]
+                ]
+                    ],
+                    'included' => [
+                        [
+                            'type' => 'organizations',
+                            'id' => $owner->organization->id,
+                            'attributes' => $owner->organization,
+                            'links' => [
+                                "self" => route('api.v1.organizations.edit', $owner->organization->id),
+                            ]
+                        ]
+                    ]
+        ]);
+    }
 }
