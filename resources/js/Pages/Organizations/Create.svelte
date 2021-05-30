@@ -3,12 +3,14 @@
     import { Inertia } from '@inertiajs/inertia';
     import { InertiaLink, page } from '@inertiajs/inertia-svelte';
     import axios from 'axios'
+    import { toFormData } from '@/utils';
 
     import Helmet from '@/Shared/Helmet.svelte';
     import Layout from '@/Shared/Layout.svelte';
     import LoadingButton from '@/Shared/LoadingButton.svelte';
     import TextInput from '@/Shared/TextInput.svelte';
     import SelectInput from '@/Shared/SelectInput.svelte';
+    import FileInput from '@/Shared/FileInput.svelte';
 
     const route = window.route;
 
@@ -26,7 +28,8 @@
         citie_id: '',
         deparment_id: '',
         countrie_id: '',
-        postal_code: ''
+        postal_code: '',
+        photo: ''
     };
 
     function handleChange({ target: { name, value } }) {
@@ -38,9 +41,22 @@
         if(name=='deparment_id'){getCities(value)}
     }
 
+    function handleFileChange(file) {
+        values = {
+            ...values,
+            photo: file
+        };
+    }
+
     function handleSubmit() {
         sending = true;
-        Inertia.post(route('organizations.store'), values).then(() => sending = false);
+
+        // since we are uploading an image
+        // we need to use FormData object
+        // for more info check utils.js
+        const formData = toFormData(values);
+
+        Inertia.post(route('organizations.store'), formData).then(() => sending = false);
     }
 
     onMount(() => {
@@ -170,6 +186,16 @@
                         errors={errors.postal_code}
                         value={values.postal_code}
                         onChange={handleChange}
+                    />
+
+                    <FileInput
+                        className="pr-6 pb-8 w-full lg:w-1/2"
+                        label="Photo"
+                        name="photo"
+                        accept="image/*"
+                        errors={errors.photo}
+                        value={values.photo}
+                        onChange={handleFileChange}
                     />
                 </div>
 

@@ -30,6 +30,7 @@ class OrganizationRequest extends FormRequest
             'address' => ['nullable', 'max:150'],
             'citie_id' => ['required', 'exists:cities,id'],
             'postal_code' => ['nullable', 'max:25'],
+            'photo' => ['nullable', 'image'],
         ];
     }
 }

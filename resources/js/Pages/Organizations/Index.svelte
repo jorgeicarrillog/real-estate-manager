@@ -35,9 +35,9 @@
                     <thead>
                         <tr class="text-left font-bold">
                             <th class="px-6 pt-5 pb-4">Nombre</th>
+                            <th class="px-6 pt-5 pb-4">Teléfono</th>
                             <th class="px-6 pt-5 pb-4">Ciudad</th>
                             <th class="px-6 pt-5 pb-4">Propiedades</th>
-                            <th class="px-6 pt-5 pb-4" colspan="2">Teléfono</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -48,13 +48,21 @@
                                 </td>
                             </tr>
                         {:else}
-                            {#each data as { id, name, citie, phone, properties_count, deleted_at } (id)}
+                            {#each data as { id, name, citie, phone, properties_count, deleted_at, photo } (id)}
                                 <tr class="hover:bg-gray-100 focus-within:bg-gray-100">
                                     <td class="border-t">
                                         <InertiaLink
                                             href={route('organizations.edit', id)}
                                             class="px-6 py-4 flex items-center focus:text-indigo-700"
                                         >
+                                        
+                                            {#if photo}
+                                            <img
+                                                src={photo}
+                                                class="block w-5 h-5 rounded-full mr-2 -my-2"
+                                                alt={name}
+                                            />
+                                            {/if}
                                             {name}
 
                                             {#if deleted_at}
@@ -63,6 +71,16 @@
                                                     className="flex-shrink-0 w-3 h-3 text-gray-400 fill-current ml-2"
                                                 />
                                             {/if}
+                                        </InertiaLink>
+                                    </td>
+
+                                    <td class="border-t">
+                                        <InertiaLink
+                                            tabindex="-1"
+                                            href={route('organizations.edit', id)}
+                                            class="px-6 py-4 flex items-center focus:text-indigo"
+                                        >
+                                            {phone}
                                         </InertiaLink>
                                     </td>
 

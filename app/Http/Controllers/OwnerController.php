@@ -66,7 +66,7 @@ class OwnerController extends Controller
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'email' => $request->email,
-            'photo_path' => $request->file('photo')->isValid() ? $request->file('photo')->store('owners') : null,
+            'photo_path' => $request->file('photo') ? $request->file('photo')->store('owners') : null,
         ]);
 
         return Redirect::route('owners')->with('success', 'Propietario creado.');

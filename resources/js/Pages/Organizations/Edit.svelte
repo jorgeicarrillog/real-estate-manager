@@ -2,6 +2,9 @@
     import { onMount } from 'svelte'
     import { Inertia } from '@inertiajs/inertia';
     import { InertiaLink, page } from '@inertiajs/inertia-svelte';
+    import { toFormData } from '@/utils';
+    import axios from 'axios'
+
     import Helmet from '@/Shared/Helmet.svelte';
     import Layout from '@/Shared/Layout.svelte';
     import DeleteButton from '@/Shared/DeleteButton.svelte';
@@ -10,10 +13,9 @@
     import SelectInput from '@/Shared/SelectInput.svelte';
     import TrashedMessage from '@/Shared/TrashedMessage.svelte';
     import Icon from '@/Shared/Icon.svelte';
-    import SearchFilter from '@/Shared/SearchFilter.svelte';
     import Pagination from '@/Shared/Pagination.svelte';
-    import axios from 'axios'
     import MoneyFormat from '@/Shared/MoneyFormat.svelte';
+    import FileInput from '@/Shared/FileInput.svelte';
 
     const route = window.route;
 
@@ -35,7 +37,8 @@
             citie_id: organization.citie_id || '',
             deparment_id: organization.citie.department_id || '',
             countrie_id: organization.citie.department.countrie_id || '',
-            postal_code: organization.postal_code || ''
+            postal_code: organization.postal_code || '',
+            photo: ''
         };
 
     function handleChange({ target: { name, value } }) {
@@ -45,9 +48,25 @@
         };
     }
 
+    function handleFileChange(file) {
+        values = {
+            ...values,
+            photo: file
+        };
+    }
+
     function handleSubmit() {
         sending = true;
-        Inertia.put(route('organizations.update', organization.id), values).then(() => sending = false);
+
+    // since we are uploading an image
+    // we need to use FormData object
+
+    // NOTE: When working with Laravel PUT/PATCH requests and FormData
+    // you SHOULD send POST request and fake the PUT request like this.
+    // For more info check utils.jf file
+    const formData = toFormData(values, 'PUT');
+
+        Inertia.post(route('organizations.update', organization.id), formData).then(() => sending = false);
     }
 
     function destroy() {
@@ -96,6 +115,10 @@
 
             <span class="text-indigo-600 font-medium mx-2">/</span>
             {values.name}
+
+            {#if organization.photo}
+                <img class="block w-8 h-8 rounded-full ml-4" src={organization.photo} alt={organization.name} />
+            {/if}
         </h1>
 
         {#if organization.deleted_at}
@@ -194,6 +217,16 @@
                         errors={errors.postal_code}
                         bind:value={values.postal_code}
                         onChange={handleChange}
+                    />
+
+                    <FileInput
+                        className="pr-6 pb-8 w-full lg:w-1/2"
+                        label="Photo"
+                        name="photo"
+                        accept="image/*"
+                        errors={errors.photo}
+                        value={values.photo}
+                        onChange={handleFileChange}
                     />
                 </div>
 

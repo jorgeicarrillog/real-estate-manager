@@ -16,6 +16,7 @@ class CreateOrganizationsTable extends Migration
             $table->string('phone', 50)->nullable();
             $table->string('address', 150)->nullable();
             $table->string('postal_code', 25)->nullable();
+            $table->string('photo_path', 100)->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('citie_id')->references('id')->on('cities');

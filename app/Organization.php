@@ -2,6 +2,9 @@
 
 namespace App;
 
+use League\Glide\Server;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Organization extends Model
@@ -13,7 +16,7 @@ class Organization extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'citie_id', 'email', 'phone', 'address', 'postal_code'];
+    protected $fillable = ['name', 'citie_id', 'email', 'phone', 'address', 'postal_code', 'photo_path'];
 
     public function users()
     {
@@ -41,5 +44,12 @@ class Organization extends Model
                 $query->onlyTrashed();
             }
         });
+    }
+
+    public function photoUrl(array $attributes)
+    {
+        if ($this->photo_path) {
+            return URL::to(App::make(Server::class)->fromPath($this->photo_path, $attributes));
+        }
     }
 }

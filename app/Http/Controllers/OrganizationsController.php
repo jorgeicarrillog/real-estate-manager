@@ -19,7 +19,17 @@ class OrganizationsController extends Controller
             $query->where('user_id', auth()->id());
         }
         $organizations = $query->withCount('properties')->paginate()
-        ->only('id', 'name', 'phone', 'citie', 'deleted_at', 'properties_count');
+        ->transform(function ($org) {
+            return [
+                'id' => $org->id,
+                'name' => $org->name,
+                'phone' => $org->phone,
+                'photo' => $org->photoUrl(['w' => 40, 'h' => 40, 'fit' => 'crop']),
+                'citie' => $org->citie,
+                'deleted_at' => $org->deleted_at,
+                'properties_count' => $org->properties_count,
+            ];
+        });
 
         return Inertia::render('Organizations/Index', [
             'filters' => Request::all('search', 'trashed'),
@@ -35,7 +45,15 @@ class OrganizationsController extends Controller
     public function store(OrganizationRequest $request)
     {
         Auth::user()->organizations()->create(
-            $request->all()
+            [
+                'name' => $request->name,
+                'citie_id' => $request->citie_id,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'postal_code' => $request->postal_code,
+                'photo_path' => $request->file('photo') ? $request->file('photo')->store('organizations') : null,
+            ]
         );
 
         return Redirect::route('organizations')->with('success', 'Inmobiliaria creada.');
@@ -44,6 +62,7 @@ class OrganizationsController extends Controller
     public function edit(Organization $organization)
     {
         $organization->load('citie.department.countrie');
+        $organization->photo = $organization->photoUrl(['w' => 60, 'h' => 60, 'fit' => 'crop']);
         return Inertia::render('Organizations/Edit', [
             'filters' => Request::all('search', 'trashed'),
             'organization' => $organization,
@@ -56,6 +75,10 @@ class OrganizationsController extends Controller
         $organization->update(
             $request->all()
         );
+
+        if ($request->file('photo') && $request->file('photo')->isValid()) {
+            $organization->update(['photo_path' => $request->file('photo')->store('organizations')]);
+        }
 
         return Redirect::back()->with('success', 'Inmobiliaria actualizada.');
     }
