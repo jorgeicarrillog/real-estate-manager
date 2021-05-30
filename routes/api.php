@@ -20,4 +20,5 @@ Route::group(['prefix' => 'v1', 'as'=>'api.v1.', 'middleware'=>'auth:sanctum'], 
 {
     //propietarios
     Route::get('owners')->name('owners.index')->uses('Api\OwnerApiController@index');
+    Route::post('owners')->name('owners.store')->uses('Api\OwnerApiController@store');
 });
