@@ -252,7 +252,7 @@
 
                 <InertiaLink
                     class="btn-indigo"
-                    href={route('organizations.create')}
+                    href={route('properties.create',organization.id)}
                 >
                     <span>Crear</span>
                     <span class="hidden md:inline"> Propiedad</span>
@@ -281,7 +281,7 @@
                                 <tr class="hover:bg-gray-100 focus-within:bg-gray-100">
                                     <td class="border-t">
                                         <InertiaLink
-                                            href={route('organizations.edit', pty.id)}
+                                            href={route('properties.edit', {propertie:pty.id, organization: pty.organization_id})}
                                             class="px-6 py-4 flex items-center focus:text-indigo-700"
                                         >
                                             {pty.title}
@@ -298,7 +298,7 @@
                                     <td class="border-t">
                                         <InertiaLink
                                             tabindex="-1"
-                                            href={route('organizations.edit', pty.id)}
+                                            href={route('properties.edit', {propertie:pty.id, organization: pty.organization_id})}
                                             class="px-6 py-4 flex items-center focus:text-indigo"
                                         >
                                             {pty.citie.name}
@@ -308,7 +308,7 @@
                                     <td class="border-t">
                                         <InertiaLink
                                             tabindex="-1"
-                                            href={route('organizations.edit', pty.id)}
+                                            href={route('properties.edit', {propertie:pty.id, organization: pty.organization_id})}
                                             class="px-6 py-4 flex items-center focus:text-indigo"
                                         >
                                             {pty.properties_type.name}
@@ -318,7 +318,7 @@
                                     <td class="border-t">
                                         <InertiaLink
                                             tabindex="-1"
-                                            href={route('organizations.edit', pty.id)}
+                                            href={route('properties.edit', {propertie:pty.id, organization: pty.organization_id})}
                                             class="px-6 py-4 flex items-center focus:text-indigo"
                                         >
                                             <MoneyFormat value={pty.value}></MoneyFormat>
@@ -328,7 +328,7 @@
                                     <td class="border-t w-px">
                                         <InertiaLink
                                             tabindex="-1"
-                                            href={route('organizations.edit', pty.id)}
+                                            href={route('properties.edit', {propertie:pty.id, organization: pty.organization_id})}
                                             class="px-4 flex items-center"
                                         >
                                             <Icon

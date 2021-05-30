@@ -33,6 +33,11 @@ class Organization extends Model
         return $this->hasMany(Propertie::class);
     }
 
+    public function owners()
+    {
+        return $this->hasMany(Owner::class);
+    }
+
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {

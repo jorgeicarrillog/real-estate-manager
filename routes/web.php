@@ -40,9 +40,21 @@ Route::put('organizations/{organization}')->name('organizations.update')->uses('
 Route::delete('organizations/{organization}')->name('organizations.destroy')->uses('OrganizationsController@destroy')->middleware('auth');
 Route::put('organizations/{organization}/restore')->name('organizations.restore')->uses('OrganizationsController@restore')->middleware('auth');
 
+//Properties
+Route::group(['prefix' => 'organizations/{organization}/'], function()
+{
+    Route::get('properties/create')->name('properties.create')->uses('PropertieController@create')->middleware('auth');
+    Route::post('properties')->name('properties.store')->uses('PropertieController@store')->middleware('auth');
+    Route::get('properties/{propertie}/edit')->name('properties.edit')->uses('PropertieController@edit')->middleware('auth');
+    Route::put('properties/{propertie}')->name('properties.update')->uses('PropertieController@update')->middleware('auth');
+    Route::delete('properties/{propertie}')->name('properties.destroy')->uses('PropertieController@destroy')->middleware('auth');
+    Route::put('properties/{propertie}/restore')->name('properties.restore')->uses('PropertieController@restore')->middleware('auth');
+});
+Route::get('properties')->name('properties')->uses('PropertieController@index');
+Route::get('properties/{propertie}')->name('properties.show')->uses('PropertieController@show');
+
 // Reports
 Route::get('reports')->name('reports')->uses('ReportsController')->middleware('auth');
-
 
 //Owners
 Route::get('owners')->name('owners')->uses('OwnerController@index')->middleware('remember', 'auth');

@@ -1,37 +1,45 @@
 <script>
+    import { onMount } from 'svelte'
     import { Inertia } from '@inertiajs/inertia';
     import { InertiaLink, page } from '@inertiajs/inertia-svelte';
+    import { toFormData } from '@/utils';
+    import axios from 'axios'
+
     import Helmet from '@/Shared/Helmet.svelte';
     import Layout from '@/Shared/Layout.svelte';
     import DeleteButton from '@/Shared/DeleteButton.svelte';
     import LoadingButton from '@/Shared/LoadingButton.svelte';
     import TextInput from '@/Shared/TextInput.svelte';
     import SelectInput from '@/Shared/SelectInput.svelte';
-    import FileInput from '@/Shared/FileInput.svelte';
+    import TrashedMessage from '@/Shared/TrashedMessage.svelte';
     import Icon from '@/Shared/Icon.svelte';
     import Pagination from '@/Shared/Pagination.svelte';
-    import { toFormData } from '@/utils';
     import MoneyFormat from '@/Shared/MoneyFormat.svelte';
+    import FileInput from '@/Shared/FileInput.svelte';
 
     const route = window.route;
 
-    let { owner } = $page;
-    $: owner = $page.owner;
-    $: errors = $page.errors;
-    $: organizations = $page.organizations;
-    $: properties = $page.properties.data;
     $: links = $page.properties.links;
+    $: properties = $page.properties.data;
+    let { organization } = $page;
+    $: errors = $page.errors;
+    $: organization = $page.organization;
 
+    let countries = [];
+    let departments = [];
+    let cities = [];
     let sending = false;
     let values = {
-        organization_id: owner.organization_id || '',
-        first_name: owner.first_name || '',
-        last_name: owner.last_name || '',
-        email: owner.email || '',
-        password: owner.password || '',
-        owner: owner.owner ? '1' : '0' || '0',
-        photo: ''
-    };
+            name: organization.name || '',
+            email: organization.email || '',
+            phone: organization.phone || '',
+            address: organization.address || '',
+            citie_id: organization.citie_id || '',
+            deparment_id: organization.citie.department_id || '',
+            countrie_id: organization.citie.department.countrie_id || '',
+            postal_code: organization.postal_code || '',
+            photo: ''
+        };
 
     function handleChange({ target: { name, value } }) {
         values = {
@@ -50,80 +58,164 @@
     function handleSubmit() {
         sending = true;
 
-        // since we are uploading an image
-        // we need to use FormData object
+    // since we are uploading an image
+    // we need to use FormData object
 
-        // NOTE: When working with Laravel PUT/PATCH requests and FormData
-        // you SHOULD send POST request and fake the PUT request like this.
-        // For more info check utils.jf file
-        const formData = toFormData(values, 'PUT');
+    // NOTE: When working with Laravel PUT/PATCH requests and FormData
+    // you SHOULD send POST request and fake the PUT request like this.
+    // For more info check utils.jf file
+    const formData = toFormData(values, 'PUT');
 
-        Inertia.post(route('owners.update', owner.id), formData).then(() => sending = false);
+        Inertia.post(route('organizations.update', organization.id), formData).then(() => sending = false);
     }
 
     function destroy() {
-        if (confirm('Are you sure you want to delete this owner?')) {
-            Inertia.delete(route('owners.destroy', owner.id));
+        if (confirm('Esta seguro de desactivar esta inmobiliaria?')) {
+            Inertia.delete(route('organizations.destroy', organization.id));
         }
     }
 
     function restore() {
-        if (confirm('Are you sure you want to restore this owner?')) {
-            Inertia.put(route('owners.restore', owner.id));
+        if (confirm('Esta seguro de activar esta inmobiliaria?')) {
+            Inertia.put(route('organizations.restore', organization.id));
         }
+    }
+
+    onMount(() => {
+        axios.get(route('web-api.countries')).then((resp)=>{
+            countries = resp.data;
+        });
+        getDeptos(values.countrie_id);
+        getCities(values.deparment_id);
+    })
+    function getDeptos(id){
+        axios.get(route('web-api.departments')+'?field=id&value='+id).then((resp)=>{
+            departments = resp.data;
+        });
+        cities = [];
+    }
+    function getCities(id){
+        axios.get(route('web-api.cities')+'?field=id&value='+id).then((resp)=>{
+            cities = resp.data;
+        });
     }
 </script>
 
-<Helmet title={`${values.first_name} ${values.last_name}`} />
+<Helmet title={values.name} />
 
 <Layout>
     <div>
-        <div class="mb-8 flex justify-start max-w-lg">
-            <h1 class="font-bold text-3xl">
-                <InertiaLink
-                    href={route('owners')}
-                    class="text-indigo-600 hover:text-indigo-700"
-                >
-                Propietario
-                </InertiaLink>
+        <h1 class="mb-8 font-bold text-3xl">
+            <InertiaLink
+                href={route('organizations')}
+                class="text-indigo-600 hover:text-indigo-700"
+            >
+                Inmobiliarias
+            </InertiaLink>
 
-                <span class="text-indigo-600 font-medium mx-2">/</span>
-                {values.first_name} {values.last_name}
-            </h1>
+            <span class="text-indigo-600 font-medium mx-2">/</span>
+            {values.name}
 
-            {#if owner.photo}
-                <img class="block w-8 h-8 rounded-full ml-4" src={owner.photo} alt={owner.name} />
+            {#if organization.photo}
+                <img class="block w-8 h-8 rounded-full ml-4" src={organization.photo} alt={organization.name} />
             {/if}
-        </div>
+        </h1>
+
+        {#if organization.deleted_at}
+            <TrashedMessage onRestore={restore}>Esta inmobiliaria esta desactivada.</TrashedMessage>
+        {/if}
 
         <div class="bg-white rounded shadow overflow-hidden max-w-3xl">
             <form on:submit|preventDefault={handleSubmit}>
                 <div class="p-8 -mr-6 -mb-8 flex flex-wrap">
                     <TextInput
                         className="pr-6 pb-8 w-full lg:w-1/2"
-                        label="First Name"
-                        name="first_name"
-                        errors={errors.first_name}
-                        value={values.first_name}
+                        label="Nombre"
+                        name="name"
+                        errors={errors.name}
+                        bind:value={values.name}
                         onChange={handleChange}
                     />
 
                     <TextInput
                         className="pr-6 pb-8 w-full lg:w-1/2"
-                        label="Last Name"
-                        name="last_name"
-                        errors={errors.last_name}
-                        value={values.last_name}
-                        onChange={handleChange}
-                    />
-
-                    <TextInput
-                        className="pr-6 pb-8 w-full lg:w-1/2"
-                        label="Email"
+                        label="Correo"
                         name="email"
                         type="email"
                         errors={errors.email}
-                        value={values.email}
+                        bind:value={values.email}
+                        onChange={handleChange}
+                    />
+
+                    <TextInput
+                        className="pr-6 pb-8 w-full lg:w-1/2"
+                        label="Teléfono"
+                        name="phone"
+                        type="text"
+                        errors={errors.phone}
+                        bind:value={values.phone}
+                        onChange={handleChange}
+                    />
+
+                    <TextInput
+                        className="pr-6 pb-8 w-full lg:w-1/2"
+                        label="Dirección"
+                        name="address"
+                        type="text"
+                        errors={errors.address}
+                        bind:value={values.address}
+                        onChange={handleChange}
+                    />
+
+                    <SelectInput
+                        className="pr-6 pb-8 w-full lg:w-1/2"
+                        label="País"
+                        name="countrie_id"
+                        errors={errors.countrie_id}
+                        bind:value={values.countrie_id}
+                        onChange={handleChange}
+                    >
+                        <option value=""></option>
+                        {#each countries as co (co.id)}
+                        <option value="{co.id}">{co.name}</option>
+                        {/each}
+                    </SelectInput>
+
+                    <SelectInput
+                        className="pr-6 pb-8 w-full lg:w-1/2"
+                        label="Departamento/Estado"
+                        name="deparment_id"
+                        errors={errors.deparment_id}
+                        bind:value={values.deparment_id}
+                        onChange={handleChange}
+                    >
+                        <option value=""></option>
+                        {#each departments as dep (dep.id)}
+                        <option value="{dep.id}">{dep.name}</option>
+                        {/each}
+                    </SelectInput>
+
+                    <SelectInput
+                        className="pr-6 pb-8 w-full lg:w-1/2"
+                        label="Ciudad"
+                        name="citie_id"
+                        errors={errors.citie_id}
+                        bind:value={values.citie_id}
+                        onChange={handleChange}
+                    >
+                        <option value=""></option>
+                        {#each cities as ct (ct.id)}
+                        <option value="{ct.id}">{ct.name}</option>
+                        {/each}
+                    </SelectInput>
+
+                    <TextInput
+                        className="pr-6 pb-8 w-full lg:w-1/2"
+                        label="Código postal"
+                        name="postal_code"
+                        type="text"
+                        errors={errors.postal_code}
+                        bind:value={values.postal_code}
                         onChange={handleChange}
                     />
 
@@ -136,31 +228,19 @@
                         value={values.photo}
                         onChange={handleFileChange}
                     />
-
-                    <SelectInput
-                        className="pr-6 pb-8 w-full "
-                        label="Owner"
-                        name="organization_id"
-                        errors={errors.organization_id}
-                        value={values.organization_id}
-                        onChange={handleChange}
-                    >
-                        <option value="">Seleccionar</option>
-                        {#each organizations as org}
-                        <option value="{org.id}">{org.name}</option>
-                        {/each}
-                    </SelectInput>
                 </div>
 
                 <div class="px-8 py-4 bg-gray-100 border-t border-gray-200 flex items-center">
-                    <DeleteButton onDelete={destroy}>Eliminar Propietario</DeleteButton>
+                    {#if !organization.deleted_at}
+                        <DeleteButton onDelete={destroy}>Desactivar Inmobiliaria</DeleteButton>
+                    {/if}
 
                     <LoadingButton
                         loading={sending}
                         type="submit"
                         className="btn-indigo ml-auto"
                     >
-                        Actualizar Propietario
+                        Actualizar Inmobiliaria
                     </LoadingButton>
                 </div>
             </form>
@@ -172,7 +252,7 @@
 
                 <InertiaLink
                     class="btn-indigo"
-                    href={route('properties.create', owner.organization_id)+'?owner_id='+owner.id}
+                    href={route('organizations.create')}
                 >
                     <span>Crear</span>
                     <span class="hidden md:inline"> Propiedad</span>
@@ -201,7 +281,7 @@
                                 <tr class="hover:bg-gray-100 focus-within:bg-gray-100">
                                     <td class="border-t">
                                         <InertiaLink
-                                            href={route('properties.edit', {propertie:pty.id, organization: pty.organization_id})}
+                                            href={route('organizations.edit', pty.id)}
                                             class="px-6 py-4 flex items-center focus:text-indigo-700"
                                         >
                                             {pty.title}
@@ -218,7 +298,7 @@
                                     <td class="border-t">
                                         <InertiaLink
                                             tabindex="-1"
-                                            href={route('properties.edit', {propertie:pty.id, organization: pty.organization_id})}
+                                            href={route('organizations.edit', pty.id)}
                                             class="px-6 py-4 flex items-center focus:text-indigo"
                                         >
                                             {pty.citie.name}
@@ -228,7 +308,7 @@
                                     <td class="border-t">
                                         <InertiaLink
                                             tabindex="-1"
-                                            href={route('properties.edit', {propertie:pty.id, organization: pty.organization_id})}
+                                            href={route('organizations.edit', pty.id)}
                                             class="px-6 py-4 flex items-center focus:text-indigo"
                                         >
                                             {pty.properties_type.name}
@@ -238,7 +318,7 @@
                                     <td class="border-t">
                                         <InertiaLink
                                             tabindex="-1"
-                                            href={route('properties.edit', {propertie:pty.id, organization: pty.organization_id})}
+                                            href={route('organizations.edit', pty.id)}
                                             class="px-6 py-4 flex items-center focus:text-indigo"
                                         >
                                             <MoneyFormat value={pty.value}></MoneyFormat>
@@ -248,7 +328,7 @@
                                     <td class="border-t w-px">
                                         <InertiaLink
                                             tabindex="-1"
-                                            href={route('properties.edit', {propertie:pty.id, organization: pty.organization_id})}
+                                            href={route('organizations.edit', pty.id)}
                                             class="px-4 flex items-center"
                                         >
                                             <Icon

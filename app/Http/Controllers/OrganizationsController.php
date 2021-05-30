@@ -66,7 +66,7 @@ class OrganizationsController extends Controller
         return Inertia::render('Organizations/Edit', [
             'filters' => Request::all('search', 'trashed'),
             'organization' => $organization,
-            'properties' => $organization->properties()->with('propertiesType', 'citie.department.countrie')->paginate(15),
+            'properties' => $organization->properties()->orderBy('updated_at', 'desc')->orderBy('created_at', 'desc')->with('propertiesType', 'citie.department.countrie')->paginate(15),
         ]);
     }
 
