@@ -48,6 +48,11 @@ Route::get('reports')->name('reports')->uses('ReportsController')->middleware('a
 Route::get('owners')->name('owners')->uses('OwnerController@index')->middleware('remember', 'auth');
 Route::get('owners/create')->name('owners.create')->uses('OwnerController@create')->middleware('auth');
 Route::post('owners')->name('owners.store')->uses('OwnerController@store')->middleware('auth');
+Route::get('owners/{owner}/edit')->name('owners.edit')->uses('OwnerController@edit')->middleware('auth');
+Route::put('owners/{owner}')->name('owners.update')->uses('OwnerController@update')->middleware('auth');
+Route::delete('owners/{owner}')->name('owners.destroy')->uses('OwnerController@destroy')->middleware('auth');
+
+//web selects
 Route::group(['prefix' => 'web-api', 'as'=>'web-api.'], function()
 {
     Route::get('countries')->name('countries')->uses('ApiController@countries');

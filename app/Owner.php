@@ -2,6 +2,9 @@
 
 namespace App;
 
+use League\Glide\Server;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Database\Eloquent\Model;
 
 class Owner extends Model
@@ -11,7 +14,7 @@ class Owner extends Model
      *
      * @var array
      */
-    protected $fillable = ['organization_id', 'first_name', 'last_name', 'email'];
+    protected $fillable = ['organization_id', 'first_name', 'last_name', 'email', 'photo_path'];
 
     public function organization()
     {
