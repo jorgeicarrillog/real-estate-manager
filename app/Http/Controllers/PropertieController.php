@@ -124,8 +124,17 @@ class PropertieController extends Controller
      * @param  \App\Propertie  $propertie
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Propertie $propertie)
+    public function destroy(Organization $organization, Propertie $propertie)
     {
-        //
+        $propertie->delete();
+
+        return Redirect::back()->with('success', 'Propiedad desactivada.');
+    }
+
+    public function restore(Organization $organization, Propertie $propertie)
+    {
+        $propertie->restore();
+
+        return Redirect::back()->with('success', 'Propiedad activada.');
     }
 }

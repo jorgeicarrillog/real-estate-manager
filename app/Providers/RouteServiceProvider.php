@@ -26,6 +26,10 @@ class RouteServiceProvider extends ServiceProvider
         //
 
         parent::boot();
+
+        Route::bind('propertie', function ($value) {
+            return \App\Propertie::withTrashed()->find($value) ?? abort(404);
+        });
     }
 
     /**

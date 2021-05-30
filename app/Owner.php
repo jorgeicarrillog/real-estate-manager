@@ -18,12 +18,12 @@ class Owner extends Model
 
     public function organization()
     {
-        return $this->belongsTo(Organization::class);
+        return $this->belongsTo(Organization::class)->withTrashed();
     }
 
     public function properties()
     {
-        return $this->hasMany(Propertie::class);
+        return $this->hasMany(Propertie::class)->withTrashed();
     }
 
     public function getNameAttribute()

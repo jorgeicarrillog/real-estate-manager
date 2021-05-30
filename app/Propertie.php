@@ -31,7 +31,12 @@ class Propertie extends Model
 
     public function organization()
     {
-        return $this->belongsTo(Organization::class);
+        return $this->belongsTo(Organization::class)->withTrashed();
+    }
+
+    public function owner()
+    {
+        return $this->belongsTo(Owner::class);
     }
 
     public function scopeFilter($query, array $filters)

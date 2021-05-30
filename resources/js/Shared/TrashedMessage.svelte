@@ -1,7 +1,9 @@
 <script>
     import Icon from '@/Shared/Icon.svelte';
-
+    
     export let onRestore;
+    export let options;
+
 </script>
 
 <div class="max-w-3xl mb-6 p-4 bg-yellow-400 rounded border border-yellow-500 flex items-center justify-between">
@@ -17,11 +19,11 @@
     </div>
 
     <button
-        class="text-yellow-800 focus:outline-none text-sm hover:underline"
+        class="border text-yellow-800 focus:outline-none text-sm hover:underline ml-1"
         tabindex="-1"
         type="button"
-        on:click={onRestore}
+        on:click={onRestore(options)}
     >
-        Restore
+        Activar
     </button>
 </div>

@@ -4,6 +4,7 @@
     import { InertiaLink, page } from '@inertiajs/inertia-svelte';
     import { toFormData } from '@/utils';
     import axios from 'axios'
+    import moment from 'moment';
 
     import Helmet from '@/Shared/Helmet.svelte';
     import Layout from '@/Shared/Layout.svelte';
@@ -18,6 +19,8 @@
     import FileInput from '@/Shared/FileInput.svelte';
 
     const route = window.route;
+
+    moment.locale('es');
 
     $: links = $page.properties.links;
     $: properties = $page.properties.data;
@@ -80,6 +83,12 @@
     function restore() {
         if (confirm('Esta seguro de activar esta inmobiliaria?')) {
             Inertia.put(route('organizations.restore', organization.id));
+        }
+    }
+
+    function restorePropertie(id) {
+        if (confirm('Esta seguro de activar esta propiedad?')) {
+            Inertia.put(route('properties.restore', {organization:organization.id, propertie:id}));
         }
     }
 
@@ -298,13 +307,6 @@
                                             class="px-6 py-4 flex items-center focus:text-indigo-700"
                                         >
                                             {pty.title}
-
-                                            {#if pty.deleted_at}
-                                                <Icon
-                                                    name="trash"
-                                                    className="flex-shrink-0 w-3 h-3 text-gray-400 fill-current ml-2"
-                                                />
-                                            {/if}
                                         </InertiaLink>
                                     </td>
 
@@ -339,6 +341,12 @@
                                     </td>
 
                                     <td class="border-t w-px">
+
+                                        {#if pty.deleted_at}
+                                            <TrashedMessage onRestore={restorePropertie} options={pty.id}>
+                                                Desactivado el {moment(pty.deleted_at).format('Do MMMM YYYY')}
+                                            </TrashedMessage>
+                                        {:else}
                                         <InertiaLink
                                             tabindex="-1"
                                             href={route('properties.edit', {propertie:pty.id, organization: pty.organization_id})}
@@ -349,6 +357,7 @@
                                                 className="block w-6 h-6 text-gray-400 fill-current"
                                             />
                                         </InertiaLink>
+                                        {/if}
                                     </td>
                                 </tr>
                             {/each}

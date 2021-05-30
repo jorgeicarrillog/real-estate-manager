@@ -1,6 +1,9 @@
 <script>
     import { Inertia } from '@inertiajs/inertia';
     import { InertiaLink, page } from '@inertiajs/inertia-svelte';
+    import { toFormData } from '@/utils';
+    import moment from 'moment';
+
     import Helmet from '@/Shared/Helmet.svelte';
     import Layout from '@/Shared/Layout.svelte';
     import DeleteButton from '@/Shared/DeleteButton.svelte';
@@ -10,10 +13,11 @@
     import FileInput from '@/Shared/FileInput.svelte';
     import Icon from '@/Shared/Icon.svelte';
     import Pagination from '@/Shared/Pagination.svelte';
-    import { toFormData } from '@/utils';
     import MoneyFormat from '@/Shared/MoneyFormat.svelte';
+    import TrashedMessage from '@/Shared/TrashedMessage.svelte';
 
     const route = window.route;
+    moment.locale('es');
 
     let { owner } = $page;
     $: owner = $page.owner;
@@ -67,9 +71,9 @@
         }
     }
 
-    function restore() {
-        if (confirm('Are you sure you want to restore this owner?')) {
-            Inertia.put(route('owners.restore', owner.id));
+    function restorePropertie(id) {
+        if (confirm('Esta seguro de activar esta propiedad?')) {
+            Inertia.put(route('properties.restore', {organization:values.organization_id, propertie:id}));
         }
     }
 </script>
@@ -256,6 +260,11 @@
                                     </td>
 
                                     <td class="border-t w-px">
+                                        {#if pty.deleted_at}
+                                            <TrashedMessage onRestore={restorePropertie} options={pty.id}>
+                                                Desactivado el {moment(pty.deleted_at).format('Do MMMM YYYY')}
+                                            </TrashedMessage>
+                                        {:else}
                                         <InertiaLink
                                             tabindex="-1"
                                             href={route('properties.edit', {propertie:pty.id, organization: pty.organization_id})}
@@ -266,6 +275,7 @@
                                                 className="block w-6 h-6 text-gray-400 fill-current"
                                             />
                                         </InertiaLink>
+                                        {/if}
                                     </td>
                                 </tr>
                             {/each}

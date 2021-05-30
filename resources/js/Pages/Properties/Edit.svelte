@@ -121,13 +121,13 @@
     }
 
     function destroy() {
-        if (confirm('Esta seguro de desactivar esta inmobiliaria?')) {
+        if (confirm('Esta seguro de desactivar esta propiedad?')) {
             Inertia.delete(route('properties.destroy', {organization:organization.id, propertie:propertie.id}));
         }
     }
 
     function restore() {
-        if (confirm('Esta seguro de activar esta inmobiliaria?')) {
+        if (confirm('Esta seguro de activar esta propiedad?')) {
             Inertia.put(route('properties.restore', {organization:organization.id, propertie:propertie.id}));
         }
     }
