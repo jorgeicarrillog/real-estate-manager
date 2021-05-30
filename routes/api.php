@@ -15,4 +15,9 @@ use Illuminate\Http\Request;
 
 //autentication tokens
 Route::post('/sanctum/token')->name('sanctum.token')->uses('ApiController@token');
+
+Route::group(['prefix' => 'v1', 'as'=>'api.v1.', 'middleware'=>'auth:sanctum'], function()
+{
+    //propietarios
+    Route::get('owners')->name('owners.index')->uses('Api\OwnerApiController@index');
 });
