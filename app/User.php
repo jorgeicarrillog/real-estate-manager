@@ -5,6 +5,7 @@ namespace App;
 use League\Glide\Server;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\URL;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,7 +15,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
 class User extends Model implements AuthenticatableContract, AuthorizableContract
 {
-    use SoftDeletes, Authenticatable, Authorizable;
+    use SoftDeletes, Authenticatable, Authorizable, HasApiTokens;
 
     protected $casts = [
         'owner' => 'boolean',
