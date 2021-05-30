@@ -130,4 +130,29 @@ class OwnerApiController extends Controller
                     ]
         ]);
     }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Owner  $owner
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Owner $owner)
+    {
+        if(in_array($owner->organization_id, auth()->user()->organizationsArrayId())){
+            if($owner->properties()->count()){
+                return response()->json([
+                    'errors' => 'No puede eliminar este Propietario ya que tiene propiedades en el sistema.'
+                ]);
+            }else{
+                $owner->delete();
+
+                return response()->json([],204);
+            }
+        }else{
+            return response()->json([
+                'errors' => 'No puede eliminar este Propietario.'
+            ]);
+        }
+    }
 }
