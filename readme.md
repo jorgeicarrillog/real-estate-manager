@@ -4,7 +4,7 @@ Una aplicación de demostración para ilustrar cómo [Inertia.js] (https://inert
 
 > Este proyecto de demostración simula un gestor de inmobiliarias un sistema que abarque ambos públicos donde la inmobiliaria pueda gestionar todos sus inmuebles en venta y arriendo con toda la información necesaria como fotografías, descripción completa de sus interiores (habitaciones, baños, garaje, piso, etc), junto a imágenes, dirección y ubicación geográfica (latitud, longitud) para que aquellos clientes cercanos o aun mas lejos puedan ver un inmueble y poder entrar en contacto con la inmobiliaria si se encuentra interesado y seguir un paso más cerca para realzar un cierre.
 
-## Instalacin
+## Instalación
 
 Clonar el repositorio localmente:
 
@@ -77,7 +77,7 @@ Usted está listo para ir! [Visite Gestor Inmobiliario](http://127.0.0.1:8000/) 
 Para ejecutar las pruebas del Gestor Inmobiliario, ejecute:
 
 ```
-phpunit
+php artisan test
 ```
 
 ## Documentación API
