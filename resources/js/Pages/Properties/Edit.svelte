@@ -374,7 +374,7 @@
                         type="submit"
                         className="ml-2 btn-indigo"
                     >
-                        Crear Inmobiliaria
+                        Editar Inmobiliaria
                     </LoadingButton>
                 </div>
             </form>
