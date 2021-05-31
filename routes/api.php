@@ -28,6 +28,7 @@ Route::group(['prefix' => 'v1', 'as'=>'api.v1.', 'middleware'=>'auth:sanctum'], 
     // Organizations
     Route::get('organizations')->name('organizations')->uses('Api\OrganizationsApiController@index');
     Route::post('organizations')->name('organizations.store')->uses('Api\OrganizationsApiController@store');
+    Route::get('organizations/{organization}')->name('organizations.show')->uses('Api\OrganizationsApiController@show');
     Route::put('organizations/{organization}')->name('organizations.update')->uses('Api\OrganizationsApiController@update');
     Route::delete('organizations/{organization}')->name('organizations.destroy')->uses('Api\OrganizationsApiController@destroy');
     Route::put('organizations/{organization}/restore')->name('organizations.restore')->uses('Api\OrganizationsApiController@restore');

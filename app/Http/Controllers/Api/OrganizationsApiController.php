@@ -69,6 +69,21 @@ class OrganizationsApiController extends Controller
     }
 
     /**
+     * Display the specified resource in storage.
+     *
+     * @param  \App\Organization  $organization
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Organization $organization)
+    {
+        $organization->type="organizations";
+        
+        return response()->json([
+            'data' => $organization,
+        ]);
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -84,6 +99,7 @@ class OrganizationsApiController extends Controller
         if ($request->file('photo') && $request->file('photo')->isValid()) {
             $organization->update(['photo_path' => $request->file('photo')->store('organizations')]);
         }
+        $organization->type="organizations";
         
         return response()->json([
             'data' => $organization,
