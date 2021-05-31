@@ -48,15 +48,6 @@
     }
   },
   "scripts": {
-    "compile": [
-      "npm run prod",
-      "@php artisan migrate:fresh",
-      "@php artisan db:seed"
-    ],
-    "reseed": [
-      "@php artisan migrate:fresh",
-      "@php artisan db:seed"
-    ],
     "post-root-package-install": [
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     ],
