@@ -87,6 +87,43 @@ class OwnerApiController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     *
+     * @param  \App\Propertie  $propertie
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Owner $owner)
+    {
+        $owner->type='owners';
+
+        return response()->json([
+            'data' => $owner->makeHidden('organization'),
+            'relationships' => [
+                'organization' => [
+                    'data' => [
+                        'type' => 'organizations',
+                        'id' => $owner->organization->id
+                    ],
+                    'links' => [
+                        "self" => route('api.v1.organizations.show', $owner->organization->id),
+                        "related" => url()->current()
+                    ]
+                ]
+                    ],
+                    'included' => [
+                        [
+                            'type' => 'organizations',
+                            'id' => $owner->organization->id,
+                            'attributes' => $owner->organization,
+                            'links' => [
+                                "self" => route('api.v1.organizations.show', $owner->organization->id),
+                            ]
+                        ]
+                    ]
+        ]);
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  OwnerRequest  $request
@@ -113,7 +150,7 @@ class OwnerApiController extends Controller
                         'id' => $owner->organization->id
                     ],
                     'links' => [
-                        "self" => route('api.v1.organizations.edit', $owner->organization->id),
+                        "self" => route('api.v1.organizations.show', $owner->organization->id),
                         "related" => url()->current()
                     ]
                 ]
@@ -124,7 +161,7 @@ class OwnerApiController extends Controller
                             'id' => $owner->organization->id,
                             'attributes' => $owner->organization,
                             'links' => [
-                                "self" => route('api.v1.organizations.edit', $owner->organization->id),
+                                "self" => route('api.v1.organizations.show', $owner->organization->id),
                             ]
                         ]
                     ]

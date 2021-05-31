@@ -21,6 +21,7 @@ Route::group(['prefix' => 'v1', 'as'=>'api.v1.', 'middleware'=>'auth:sanctum'], 
     //propietarios
     Route::get('owners')->name('owners.index')->uses('Api\OwnerApiController@index');
     Route::post('owners')->name('owners.store')->uses('Api\OwnerApiController@store');
+    Route::get('owners/{owner}')->name('owners.show')->uses('Api\OwnerApiController@show');
     Route::put('owners/{owner}')->name('owners.update')->uses('Api\OwnerApiController@update');
     Route::delete('owners/{owner}')->name('owners.destroy')->uses('Api\OwnerApiController@destroy');
 
