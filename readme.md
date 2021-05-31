@@ -96,6 +96,9 @@ En esta sección se describen las API para la gestión de inmobiliarias.
 ### [Propiedades](https://documenter.getpostman.com/view/4570635/TzXzEctf)
 En esta sección se describen las API para la gestión de propiedades.
 
+## [Publicación proyecto demo en Heroku](https://github.com/jorgeicarrillog/real-estate-manager/wiki/Publicación-proyecto-demo-en-Heroku)
+En esta sección se describen los pasos para publicar un [DEMO](https://demo-real-estate-manager.herokuapp.com) en Heroku.
+
 ## Créditos
 
 - Jorge Ivan Carrillo Gonzalez [(@jorgeicarrillog)](https://github.com/jorgeicarrillog).
