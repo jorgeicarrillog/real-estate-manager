@@ -53,6 +53,7 @@
   },
   "scripts": {
     "compile": [
+      "npm run prod",
       "@php artisan route:cache",
       "@php artisan event:cache",
       "@php artisan view:cache"
