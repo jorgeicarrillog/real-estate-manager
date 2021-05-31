@@ -49,8 +49,6 @@
   },
   "scripts": {
     "compile": [
-      "@php artisan migrate:fresh",
-      "@php artisan db:seed"
     ],
     "reseed": [
       "@php artisan migrate:fresh",
