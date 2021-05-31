@@ -71,8 +71,3 @@ Route::group(['prefix' => 'web-api', 'as'=>'web-api.'], function()
     Route::get('departments')->name('departments')->uses('ApiController@departments');
     Route::get('cities')->name('cities')->uses('ApiController@cities');
 });
-
-// 500 error
-Route::get('500', function () {
-    echo $fail;
-});
