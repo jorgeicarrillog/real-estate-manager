@@ -78,7 +78,7 @@ class ApiController extends Controller
     public function GeoProperties(Request $request)
     {
         if ($request->latitude && $request->longitude) {
-            $properties = Propertie::select(['*', DB::raw('(6371 * acos (cos ( radians('.$request->latitude.') )* cos( radians( latitude ) )* cos( radians( longitude ) - radians('.$request->longitude.') )+ sin ( radians('.$request->latitude.') )* sin( radians( latitude ) )))')])
+            $properties = Propertie::select(['latitude', 'longitude', 'photo_path', 'title', DB::raw('(6371 * acos (cos ( radians('.$request->latitude.') )* cos( radians( latitude ) )* cos( radians( longitude ) - radians('.$request->longitude.') )+ sin ( radians('.$request->latitude.') )* sin( radians( latitude ) )))')])
             ->havingRaw('(6371 * acos (cos ( radians('.$request->latitude.') )* cos( radians( latitude ) )* cos( radians( longitude ) - radians('.$request->longitude.') )+ sin ( radians('.$request->latitude.') )* sin( radians( latitude ) ))) < '.(($request->dst)?$request->dst:5))->limit(40)->get()
             ->transform(function ($pty) {
                 return [
