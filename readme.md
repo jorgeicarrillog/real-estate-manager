@@ -80,6 +80,22 @@ Para ejecutar las pruebas del Gestor Inmobiliario, ejecute:
 phpunit
 ```
 
+## Documentación API
+
+### [Autenticación](https://documenter.getpostman.com/view/4570635/TzXzEctc)
+La plataforma proporciona un sistema de autenticación ligero para API simples basadas en tokens. Permite que cada usuario de la aplicación genere múltiples tokens API para su cuenta.
+
+### [Propietarios](https://documenter.getpostman.com/view/4570635/TzXzEctd)
+En esta sección se describen las API para la gestión de propietarios.
+
+*Nota:* Debe utilizar la autenticación con la api key para acceder a los datos.
+
+### [Inmobiliarias](https://documenter.getpostman.com/view/4570635/TzXzEcte)
+En esta sección se describen las API para la gestión de inmobiliarias.
+
+### [Propiedades](https://documenter.getpostman.com/view/4570635/TzXzEctf)
+En esta sección se describen las API para la gestión de propiedades.
+
 ## Créditos
 
 - Jorge Ivan Carrillo Gonzalez (@jorgeicarrillog)
