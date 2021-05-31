@@ -17,8 +17,7 @@ class UsersController extends Controller
     {
         return Inertia::render('Users/Index', [
             'filters' => Request::all('search', 'role', 'trashed'),
-            'users' => Auth::user()->account->users()
-                ->orderByName()
+            'users' => User::orderByName()
                 ->filter(Request::only('search', 'role', 'trashed'))
                 ->paginate()
                 ->transform(function ($user) {
@@ -50,7 +49,7 @@ class UsersController extends Controller
             'photo' => ['nullable', 'image'],
         ]);
 
-        Auth::user()->account->users()->create([
+        User::create([
             'first_name' => Request::get('first_name'),
             'last_name' => Request::get('last_name'),
             'email' => Request::get('email'),
