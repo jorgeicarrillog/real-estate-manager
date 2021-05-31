@@ -98,7 +98,7 @@ En esta sección se describen las API para la gestión de propiedades.
 
 ## Créditos
 
-- Jorge Ivan Carrillo Gonzalez (@jorgeicarrillog)
+- Jorge Ivan Carrillo Gonzalez [(@jorgeicarrillog)](https://github.com/jorgeicarrillog).
 - Platilla original [Ping CRM](https://github.com/zgabievi/pingcrm-svelte.git).
 # real-estate-manager
 
