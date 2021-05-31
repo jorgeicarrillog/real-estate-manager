@@ -5,6 +5,9 @@
     "framework",
     "laravel"
   ],
+  "engines": {
+    "node": "12.x"
+  },
   "license": "MIT",
   "type": "project",
   "require": {
