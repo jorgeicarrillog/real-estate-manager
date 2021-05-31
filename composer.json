@@ -52,6 +52,11 @@
     }
   },
   "scripts": {
+    "compile": [
+      "@php artisan route:cache",
+      "@php artisan event:cache",
+      "@php artisan view:cache"
+    ],
     "post-root-package-install": [
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     ],
